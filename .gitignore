@@ -1,0 +1,11 @@
+bin/
+share/
+lib*
+__pycache__/
+*.json.gz
+*.npy
+*.pkl
+*.csv
+*.bin*
+*.tar.gz
+

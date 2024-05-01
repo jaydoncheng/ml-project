@@ -1,0 +1,311 @@
+﻿Towards Generalizable Sentiment Analysis: Leveraging Readily Available Labelled Data for Diverse Textual Formats
+Authors: Jaydon Cheng, Davit Darbinyan, Dide Poyraz, Maria Stivala, Christien Xie
+Abstract
+…..
+This article conducts a detailed investigation into the development of generalizable sentiment analysis models trained on the Amazon Reviews dataset, aiming to improve our understanding in analysing sentiments across varying textual formats. By comparing the performance and efficiency of traditional machine learning models with advanced deep learning architectures, we considered and analysed potential feature extraction techniques to enhance sentiment analysis performance beyond word-level approaches. We observed that, while deep learning models offer potential for capturing subtleties of sentiment, they require substantial effort in tuning and calibrating models to prevent overfitting and ensure the learning of the model. Our work contributes to the ongoing discussion on leveraging machine learning for sentiment analysis and provides model specific insights on the strengths and weaknesses of different architectures.
+
+
+Keywords: Sentiment Analysis, Deep Learning, User Reviews, User Ratings, Feature Extraction
+1 Introduction
+1.1 Motivation
+Sentiment analysis, the process of extracting sentiment or opinion from text, plays a pivotal role in understanding customer feedback and shaping business strategies. However, the proliferation of diverse textual formats, ranging from product reviews to social media posts, poses a significant challenge for developing sentiment analysis models that are both accurate and generalizable across different contexts. 
+1.2 Hypothesis
+This research investigates whether leveraging feature extraction within machine learning architectures, trained on readily available labelled data, such as Amazon’s Reviews dataset, can improve sentiment analysis performance for informal text data compared to traditional word-level approaches. Thus, our research question is “Can we train a generalizable sentiment analysis model on readily available labelled data to effectively analyse sentiments expressed in diverse textual formats?” This focus aims to enhance generalizability across diverse textual formats, which aligns with the growing need for sentiment analysis solutions, which can adapt to the ever-evolving landscape of online communication. 
+1.3 Approach
+We begin by conducting a thorough analysis of Amazon’s Reviews dataset, in particular the Cell Phones and Accessories category, focusing on characterising the level of informality present. Following this, we will perform essential data pre-processing techniques to prepare the dataset for modelling. This may include normalisation techniques, cleaning procedures, and strategies for addressing missing values. To establish a baseline performance benchmark, we will implement and evaluate sentiment analysis models using traditional machine learning approaches, such as Naive Bayes and SVMs. Evaluating these baseline models allows for comparison with the performance achieved by deep learning architectures, in particular LSTMs/RNNs and CNNs, known for their success in natural language processing tasks. Finally, to evaluate the performance of all implemented models, we will employ standard sentiment analysis metrics, such as accuracy, precision, and recall, which will provide insights into the models’ ability to correctly classify sentiment labels. Additionally, we may make use of confusion matrices and ROCs to visualise the metrics mentioned above. By following this approach, we aim to identify the most effective approach for sentiment analysis in informal text settings. 
+1.4 Literature Review
+Numerous studies have explored different techniques to analyse text data, aiming to automatically classify opinions within the text. Traditional methods such as Naïve Bayes and Support Vector Machines (SVMs) have shown great efficacy in sentiment classification. Tanjim et al. (2018) achieved over 90% accuracy in sentiment classification of online reviews using a combination of feature extraction techniques and an NB classifier [8]. Similarly, Bamgboye et al. (2023) employed SVMs for customer review classification in e-commerce, achieving an accuracy of 86.67% [1]. Anuj & Shubhamoy (2013) explored a boosted SVM approach, which combines multiple weak SVM classifiers for improved performance. This method achieved higher accuracy (up to 93%) compared to a single SVM [2].
+However, advancements in deep learning, for example, Long Short-Term Memory (LSTM) networks and Bidirectional Gated Recurrent Units (Bi-GRUs), have introduced more nuanced analysis capabilities. Zhenxiang et al (2016) compared LSTMs with feed-forward neural networks for review usefulness classification. They found LSTMs superior due to their ability to retain more information during word sequence processing [10]. Najla et al. (2021) investigated the effectiveness of word embedding techniques and RNN variants for sentiment analysis of Amazon reviews. Their study revealed that GLSTM-RNN with FastText achieved the highest accuracy (93.75%) for unbalanced data, while LSTM-RNN with FastText performed best for balanced data (88.39%) [3]. Nishit & Fatma (2019) employed a deep learning approach to identify inconsistencies between customer reviews and star ratings on Amazon. Their model utilised paragraph vectors for semantic understanding and a Gated Recurrent Unit (GRU) for learning product embeddings from review sequences. Finally, a SVM classifier was used for sentiment classification. This approach achieved an accuracy of 81.29% using only review text, with an improvement to 81.82% when incorporating product details [5]. 
+
+
+Basem & Ayman (2020) proposed a deep learning framework with Bi-GRUs for predicting star ratings from online reviews. This two-phased model first predicts sentiment (positive, negative, or neutral) and then uses that information to predict the star rating. Their framework achieved improvements in predicting ratings compared to baseline approaches [7].
+
+
+Jianmo, Jiacheng, & Julian (2019) tackle the challenge of generating justifications for recommendations on platforms like e-commerce and streaming services. They propose two models, Ref2Seq and ACMLM, to create justifications that explain why a particular item is recommended to a user.  Both Ref2Seq and ACMLM outperform baseline models, demonstrating their effectiveness in generating convincing and diverse justifications. By providing clear explanations for recommendations, users can make more informed decisions and trust the system's suggestions [6].
+
+
+Several studies have compared the performance of different sentiment analysis methods. Meylan & Apriandy (2019) found Naïve Bayes to outperform SVM and KNN for sentiment analysis on Twitter data [9]. Similarly, Behrooz (2021) compared six machine learning algorithms and concluded that Naïve Bayes performs better with smaller feature sets, while Decision Trees and SVMs benefit from larger feature sets. Artificial Neural Networks (ANNs) were found to underperform compared to other algorithms in this study [4].
+2 Data Inspection and Preparation
+2.1 Data Inspection
+In order to better understand the distribution of the review ratings, we plotted them into a histogram and pie chart.  
+  
+
+To better understand the distribution of the review categories, we made a histogram and pie chart.    
+2.2 Data Preparation
+2.2.1 Data Pre-Processing
+1. Create a new data frame using only the category column and the concatenation of reviewText and summary columns.
+2. Remove rows with null values.
+3. Undersample the data to get an equal number of instances per class. Shuffle the classes afterwards, so that the order is random.
+4. Convert all characters to lowercase.
+5. Remove any HTML tags and URLs if present, as well as extra white spaces.
+   1. Perform spelling corrections (may be unnecessary, takes a very long time).
+6. Remove the contractions from the data. For example, shouldn't will be converted to should not.
+7. Tokenize the reviews. Two different tokenization methods are used, including word-based and sentence-based.
+8. Remove punctuation (except for ! and ?), special characters and numbers.
+9. Remove stop words.
+10. Lemmatize the reviews (reduce words to their base or root form, for instance 'crying' into 'cry').
+2.2.2 Feature Extraction
+1. The first feature we will use is the word2vec embeddings. We'll try two different approaches, training the word2vec model on our own dataset and using an already pre-trained model. 
+2. The second feature we will use is TF-IDF, which assigns each word a score/weight that represents its importance among the review corpora.
+2.3 Test set and Training set
+We ensured that 80% of the data is used for training the model and 20% is used for testing its performance on unseen data.
+3 Methods
+3.1 Naive Bayes 
+Naïve Bayes classifier is an algorithm derived from Bayes’ probability theory and is often used for text classification. This algorithm is a probabilistic classifier, meaning that it learns the probability of every object, its features, and which group they fall under. The reason that it is called naïve is due to the conditional independence between every pair of features given the value of the class variable. In practice, it is almost impossible that the model will be able to get a set of predictors which are independent in their entirety. The model instantiates a GaussianNB classifier, a variation of Naive Bayes assuming Gaussian distribution of features. This is not only a simple approach but also a fast and accurate method for prediction. Since we were working with a large dataset, this model was chosen due to its ability to efficiently work on a large dataset. 
+3.2 Support Vector Machine (SVM)
+This Support Vector Machine (SVM) acts as a classifier that learns to distinguish between positive and negative reviews. It achieves this by finding a hyperplane, a decision boundary, in the feature space that maximises the margin between the positive and negative review data points. This margin represents the confidence level of the classification. 
+3.3 Convolutional Neural Network (CNN) 
+Convolutional Neural Networks are neural networks primarily used for processing visual data such as images and video. They are composed of several layers: 
+* convolutional layers, which consist of filters or kernels that convolve across the input data, extracting spatial patterns and hierarchical features
+* pooling layers, which downsample feature maps to reduce computational complexity and control overfitting
+* fully connected layers, which are located at the end of the model and map learned features to classes
+
+The architecture for the CNN model will consist of 2 one dimensional convolutional layers, each of which are followed by a max pooling layer. Followed by a global max pooling layer and two fully connected layers with a dropout layer for regularization. 
+
+3.4 Recurrent Neural Network (RNN) and Long Short Term Memory (LSTM)
+Recurrent Neural Networks are a class of neural networks designed to handle sequential data like text and audio signals. Opposing conventional feedforward neural networks that process data in one direction, RNNs have connections looping back to itself. This allows it to maintain the memory of the processed data until that point. However RNNs have difficulty maintaining memory for long sequences due to the vanishing gradient problem. The reason for this is because when training RNNs the backpropagation through time (BPTT) algorithm is used and as gradients travel back the gradient shrinks exponentially causing earlier timesteps to receive very small updates, and "vanish" as a solution variations of RNNs such as Long Short Term Memory (LSTM) and Gated Recurrent Units (GRU) were invented. 
+For our project the sequential nature of the data where the order of words are important for deducing context, RNNs seem to be a potential candidate model that would understand context and handle variable-length input. Additionally, we will also use LSTMs to compare the results of both models in terms of precision accuracy and recall for validation and test sets. 
+
+
+In order to make RNN less prone to overfitting  during training we are planning to employ some measures such as reducing the embedding dimension to simplify the model which  allows for fewer trainable parameters to have a simpler model to prevent overfitting and less computational overhead. L2 regularisation that works by adding a penalty to the loss functions to encourage the model to keep the weights as small as possible. Increasing dropout rates that drop out random neurons in the network during training and alternating which neurons are dropped out on each pass. This is going to be done considering the balance needed for the dropout rates to prevent underfitting. Lastly, using early stopping callback which monitors the model's performance at each epoch and stops if the model's performance stops improving for a previously specified number of epochs.
+
+
+Long Short Term Memory (LSTM) is an alternative way to implement RNNs that are capable of maintaining memory on longer sequences of data. In review classification, especially with longer reviews, having a thorough understanding of the context is fundamental to successfully classifying instances. Key components of LSTMs are the Cell State and Gates. LSTMs can decide which information to forget or keep with the Forget Gate and it also has Input and Output Gates. The cell state carries relevant information throughout the processing of the data. LSTMs are highly suitable for our research because of their ability to remember long term dependencies.
+4 Results
+4.1 Naive Bayes 
+The model calculates its accuracy, a metric measuring the proportion of correctly classified examples, of which the value obtained is 38.925%. Additionally, the weighted F1 score is computed, a harmonic mean of precision and recall, providing a comprehensive evaluation of the model’s ability to balance both aspects. The F1 value obtained is (rounded up) 0.45. Lastly, the model generated a visual representation of the model’s performance across different classes, showcasing its strengths and weaknesses in identifying specific categories. The model seems to perform well for category 0, with a high percentage of 85% of True Positives. There is a significant number of misclassifications for categories 1 and 2. Only 19.4% of instances predicted as category 1 were truly in that category. Similarly, just 13.8% of the predicted category 2 instances truly belong to that category. The model seems to be overly confident in assigning these labels, even when they are not the most fitting categories for the data points. While the model has a good precision for category 0, its low recall of 35.5% indicates it misses many relevant instances. Both category 1 and 2 suffer from low precision and low recall. This suggests that the model struggles to accurately identify these categories. 
+4.2 Support Vector Machine (SVM)
+The model achieved a higher precision for  positive sentiment (0.68) compared to negative (0.41) and neutral (0.37) sentiments. Additionally, for recall, neutral (0.74) sentiments have higher predictions followed by negative (0.28) and positive (0.21) sentiments. Lastly, the F1-score, providing a balance between the aforementioned two metrics, predicted highest for neutral (0.49) sentiments followed by negative (0.33) and positive (0.32) sentiments. It achieved an accuracy of 0.41, which means it correctly classified 41% of the instance across all classes. This suggests there is room for improvement in correctly classifying instances across all categories. The model seems to overall favour positive sentiment, but misses many relevant positive and negative instances. It performs best for neutral sentiment, indicating a balanced performance between precision and recall.
+4.3 Convolutional Neural Network (CNN)
+….
+4.4 Recurrent Neural Network (RNN)  and LSTM
+We split 20% of the validation data from training data to ensure the separation of validation and test data. Experimentation with RNNs revealed that the batch size (64) significantly affects model performance. When we used smaller batch sizes (32) this resulted in the introduction of higher levels of noise into the training, negatively impacting the performance accuracy. Furthermore, throughout the training of both RNN and LSTMs, we discovered that the validation accuracy surpassed training accuracy. This typically suggests underfitting, potentially due to excessive regularisation and dropout rates that we employed.
+
+
+Training LSTMs was more productive than RNNs because of the LSTM's ability to remember longer sequences. A basic LSTM with one fully connected layer did not perform well with an accuracy of 32.8%. However, when we added a second fully connected layer with 24 inputs and a ReLu activation function, a notable shift occurred in the performance of our model. The accuracy increased to up to 70% (at 163 epochs) for the training accuracy and converged to 64.8% after 200 epochs. We observed that due to the complexity and the size of the data, unless we ran at least 50 epochs the accuracy did not increase to more than 50%. This highlighted the fact that the model was able to learn given sufficient time and iterations. However, we did not have sufficient time and resources to run more than 200 epochs.
+
+
+In another effort to perform better, we enhanced the model with additional dense layers, batch normalization,  and introduced dropout regularization after each layer. This said "enhancement" made the training accuracy consistently exceed the validation accuracy. We concluded this as a case of overfitting due to the dense layers making the network memorise the training data instead of learning from it. This was empirically validated because the test accuracy decreased to 35% with the added layers from a baseline of 53.1%  (for 50 epochs). Interestingly neither removing batch normalization and leaving additional layers and dropouts, or removing additional layers and dropouts and leaving batch normalization increased the model's performance, suggesting that these adjustments alone were insufficient to mitigate overfitting tendencies or they were not calibrated in a better balance.
+5 Discussion
+5.1
+5.2
+5.3
+5.4         Recurrent Neural Network (RNN)  and LSTM
+The findings contribute to our understanding on model training dynamics in sentiment analysis, emphasising the important role of architectural decisions and training configurations  to achieve optimal performance. The variation in the model behaviour from underfitting to overfitting based on configurations provides valuable insights into the balance required to train and configure model architectures for conducting sentiment analysis. While LSTMs offer promising performance for sentiment analysis abilities, their success is heavily dependent on the configuring of the model and the amount of compute resources that are  available.
+
+
+While traditional machine learning methods like Naïve Bayes and SVMs have shown promising results, deep learning techniques seem to offer superior performance, especially for complex tasks involving long-range dependencies in text data. 
+
+
+LSTMs, Bi-GRUs, and other RNN variants combined with word embedding techniques have demonstrated high accuracy in sentiment classification tasks.
+
+
+Future research directions could explore the integration of deep learning models with other techniques like attention mechanisms to further enhance the accuracy and nuance of sentiment analysis. 
+
+
+Additionally, research on handling imbalanced datasets and incorporating domain-specific knowledge into sentiment analysis models holds promise for even more robust and effective solutions.[a]
+6 Conclusion
+In this paper we investigated to address the question of whether it's  possible a generalizable sentiment analysis model using readily available labelled data. Through a comprehensive study starting from traditional machine learning approaches such as Naive Bayes and Support Vector Machines (SVMs), to more advanced deep learning architectures, we strived to improve our understanding of the intricacies of sentiment analysis for informal text data, that is Amazon product reviews.
+
+
+Our findings revealed a complex landscape where no single model excelled across all categories of sentiment. The Naive Bayes model demonstrated an exemplary precision in identifying positive sentiments but significantly struggled with negative and neutral sentiments. This reflected its limitations in handling the often subjective and subtle nature of sentiment analysis. On the other hand, deep learning models, particularly LSTMs showed promising ability to analyse the reviews. Although this came with other challenges of the tendencies toward overfitting, that indicated the importance of careful model configuration to balance and regularize learning capacity with generalization ability.
+
+
+
+
+
+
+In this paper, there was the investigation to answer the question: 
+
+
+
+
+
+
+Can we train a generalizable sentiment analysis model on readily available labelled data to effectively analyse sentiments expressed in diverse textual formats?
+To answer this properly, multiple algorithms were compared and analysed. 
+
+
+
+
+What went well is..
+What could be improved is….
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+References
+[1] Bamgboye, P. O., Adebiyi, M. O., Adebiyi, A. A., Osang, F. B., Adebiyi, A. A., Enwere, M. N., & Shekari, A. (2023). Intelligent Sustainable Systems, 407–415. doi:10.1007/978-981-19-7663-6_38
+
+
+[2] Sharma, A., & Dey, S. (2013). Proceedings of the 2013 Research in Adaptive and Convergent Systems. doi:10.1145/2513228.2513311
+
+
+[3] Alharbi, N. M., Alghamdi, N. S., Alkhammash, E. H., & Al Amri, J. F. (2021). Evaluation of Sentiment Analysis via Word Embedding and RNN Variants for Amazon Online Reviews. doi:10.1155/2021/5536560
+
+
+[4] Noori, B. (2021). Applied Artificial Intelligence, 35(8), 567–588. doi:10.1080/08839514.2021.1922843
+
+
+[5] Shrestha, N., & Nasoz, F. (2019). Deep Learning Sentiment Analysis of Amazon.com Reviews and Ratings. 
+doi:10.48550/arXiv.1904.04096
+
+
+[6] Ni, J., Li, J., & McAuley, J. (2019). Justifying Recommendations using Distantly-Labeled Reviews and Fine-Grained Aspects. Conference on Empirical Methods in Natural Language Processing.
+doi:10.18653/v1/D19-1018
+
+
+[7] Ahmed, B. H., & Ghabayen, A. S. (2020). Journal of Ambient Intelligence and Humanized Computing, 13(7), 3423–3432. doi:10.1007/s12652-020-01807-4
+
+
+[8] Haque, Tanjim & Saber, Nudrat & Shah, Faisal. (2018). Sentiment analysis on large scale Amazon product reviews. doi:10.1109/ICIRD.2018.8376299.
+
+
+[9] Wongkar, M., & Angdresey, A. (2019). Sentiment Analysis Using Naive Bayes Algorithm Of The Data Crawler: Twitter. 2019 Fourth International Conference on Informatics and Computing (ICIC), 1-5.
+doi:10.1109/ICIC47613.2019.8985884
+
+
+[10] Zhou, Z. (2016). Amazon Food Review Classification using Deep Learning and Recommender System. Retrieved from http://cs224d.stanford.edu/reports/ZhouXu.pdf
+
+
+[11] Kim, Yoon. (2014). Convolutional Neural Networks for Sentence Classification. Proceedings of the 2014 Conference on Empirical Methods in Natural Language Processing. 10.3115/v1/D14-1181.
+
+
+
+
+For RNN and LSTMs https://medium.com/@muhammadluay45/sentiment-analysis-using-recurrent-neural-network-rnn-long-short-term-memory-lstm-and-38d6e670173f
+For Naive Bayes + SVM
+https://medium.com/@bedigunjit/simple-guide-to-text-classification-nlp-using-svm-and-naive-bayes-with-python-421db3a72d34
+https://www.datacamp.com/tutorial/naive-bayes-scikit-learn
+https://www.datacamp.com/tutorial/svm-classification-scikit-learn-python
+https://www.kaggle.com/code/dimasmunoz/simple-text-classification-with-svm
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+LSTM Confusion matrix
+LSTM Accuracy Score ->  64.775
+Accuracy: 0.64775
+F1 Score: 0.6479166416106433
+
+
+
+
+
+
+Appendix
+  
+
+Figure 1: 
+
+
+  
+
+Figure 2: SVM Results: Precision, Recell, F1 Score, Support
+
+
+ Results for Naive Bayes
+ 
+
+Figure 3: Naive Bayes Confusion Matrix
+
+
+[a]part of lit study, thought maybe it fits here?
